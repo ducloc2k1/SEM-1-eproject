@@ -1,0 +1,73 @@
+@extends('layouts.admin')
+@section('main_admin')
+<section class="content" ng-app="role" ng-controller="roleController">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Thêm mới nhóm quyền</h3>
+                </div>
+                <form action="{{route('admin.role.update',$model->id)}}" method="POST" role="form" >
+                    @csrf @method('PUT')
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="">Tên nhóm</label>
+                            <input type="text" class="form-control" name="name" value="{{$model->name}}">
+                            @if ($errors->has('name'))
+                                <small style="color:red">{{$errors->first('name')}}</small>
+                            @endif
+                        </div>
+                        <div class="form-group" >
+                            <label for="">Phân quyền</label>
+                            <input type="text" class="form-control" ng-model="role_name" placeholder="Search ...">
+                            <br>
+                            <label for=""><input type="checkbox" id="check-all"> Check all</label>
+                            <div style="height: 300px;overflow-y:auto;">
+                                    <div class="checkbox" ng-repeat="r in roles | filter:role_name">
+                                        <label>
+                                            <input type="checkbox" class="role-item" ng-checked="setChecked(r)" ng-model="role" name="route[]" value="@{{r}}">
+                                            @{{r}}
+                                        </label>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <a href="{{route('admin.role.index')}}" class="btn btn-default">Cancel</a>
+                        <button type="submit" class="btn btn-primary pull-right">Cập nhật</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+</section>
+@endsection
+@section('js')
+<script>
+
+    var app=angular.module('role',[]);
+    app.controller('roleController', function($scope){
+
+        var roles='<?php echo json_encode($routes); ?>';
+        var permissions='<?php echo json_encode($permissions); ?>';
+
+        $scope.roles=angular.fromJson(roles);
+        $scope.role=angular.fromJson(permissions);
+
+        $scope.setChecked = function(r) {
+            for(var i=0; i < $scope.role.length; i++){
+                if($scope.role[i] == r){
+                    return true;
+                }
+            }
+                return false;
+        }
+    });
+
+    //jquery
+
+    $("#check-all").click(function(){
+        $('input.role-item').not(this).prop('checked', this.checked);
+    });
+
+</script>
+@endsection
